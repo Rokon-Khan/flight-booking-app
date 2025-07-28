@@ -68,7 +68,7 @@ export const Navbar = () => {
           <Link href="/" className="flex items-center space-x-2">
             <Plane className="h-8 w-8 text-primary" />
             <span className="text-2xl font-bold bg-gradient-sky bg-clip-text text-transparent">
-              SkyReserve
+              FlightBook
             </span>
           </Link>
 
@@ -118,7 +118,7 @@ export const Navbar = () => {
                   <div className="flex items-center space-x-2 mb-6">
                     <Plane className="h-6 w-6 text-primary" />
                     <span className="text-xl font-bold bg-gradient-sky bg-clip-text text-transparent">
-                      SkyReserve
+                      FlightBook
                     </span>
                   </div>
 

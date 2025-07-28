@@ -110,7 +110,8 @@ const FlightsPage = () => {
           alt="Hero image"
           fill
           className="object-cover object-center"
-          priority // Optional: if this is a hero image above the fold
+          priority={true}
+          placeholder="blur"
         />
 
         <div className="absolute inset-0 bg-black/40" />
