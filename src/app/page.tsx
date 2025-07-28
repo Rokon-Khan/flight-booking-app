@@ -1,13 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
-import heroImage from "@/assets/Flight-aviation-Image.png";
-import { FlightCard } from "@/components/FlightCard";
+
+import { FlightList } from "@/components/FlightCard";
 import { FlightSearch, type SearchFilters } from "@/components/FlightSearch";
-import { Navbar } from "@/components/navbar";
+import HeroSection from "@/components/HeroSection";
 import { SeatBooking } from "@/components/SeatBooking";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { type Booking, type Flight } from "@/schemas/flight";
-import Image from "next/image";
 import { useState } from "react";
 
 // Mock flight data
@@ -96,34 +95,9 @@ const FlightsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-
+    <div>
       {/* Hero Section */}
-      {/* <div
-        className="relative h-64 bg-cover bg-center flex items-center justify-center"
-        style={{ backgroundImage: `url(${heroImage})` }}
-      > */}
-      <div className="relative h-96 flex items-center justify-center">
-        <Image
-          src={heroImage}
-          alt="Hero image"
-          fill
-          className="object-cover object-center"
-          priority={true}
-          placeholder="blur"
-        />
-
-        <div className="absolute inset-0 bg-black/40" />
-        <div className="relative text-center text-white">
-          <h1 className="text-4xl md:text-6xl font-bold mb-4">
-            Find Your Perfect Flight
-          </h1>
-          <p className="text-lg md:text-xl">
-            Book with confidence, fly with comfort
-          </p>
-        </div>
-      </div>
+      <HeroSection />
 
       <div className="container mx-auto px-4 py-8 space-y-8">
         {/* Search Section */}
@@ -142,15 +116,16 @@ const FlightsPage = () => {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {filteredFlights.map((flight) => (
-                <FlightCard
-                  key={flight.flight_number}
-                  flight={flight}
-                  onBook={handleBookFlight}
-                />
-              ))}
-            </div>
+            // <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            //   {filteredFlights.map((flight) => (
+            //     <FlightCard
+            //       key={flight.flight_number}
+            //       flight={flight}
+            //       onBook={handleBookFlight}
+            //     />
+            //   ))}
+            // </div>
+            <FlightList />
           )}
         </div>
       </div>

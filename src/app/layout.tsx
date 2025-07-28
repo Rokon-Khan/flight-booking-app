@@ -1,3 +1,5 @@
+import { Footer } from "@/components/Footer";
+import { Navbar } from "@/components/navbar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/lib/auth-context";
@@ -28,8 +30,11 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <AuthProvider>
-            {children}
+            {/* Navbar */}
+            <Navbar />
+            <main className="min-h-screen bg-background">{children}</main>
             <Toaster position="top-center" />
+            <Footer />
           </AuthProvider>
         </ThemeProvider>
       </body>
