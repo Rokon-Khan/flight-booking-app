@@ -1,4 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 "use client";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,13 +19,33 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { bookingSchema, type Booking, type Flight } from "@/schemas/flight";
+import { bookingSchema } from "@/schemas/flight";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Cookies from "js-cookie";
+import { CheckCircle, Clock } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-// import { useToast } from "@/hooks/use-toast";
-import { CheckCircle, Clock } from "lucide-react";
 import { toast } from "sonner";
+
+interface Flight {
+  _id: string;
+  airline: string;
+  flight_number: string;
+  origin: string;
+  destination: string;
+  date: string;
+  time: string;
+  price: number;
+  seats: string[];
+  seatIds: string[];
+}
+
+interface Booking {
+  flightId: string;
+  seatIds: string[];
+  passengerName: string;
+  passengerEmail: string;
+}
 
 interface SeatBookingProps {
   flight: Flight;
@@ -37,21 +58,22 @@ export const SeatBooking = ({
   onBookingComplete,
   onClose,
 }: SeatBookingProps) => {
-  //   const { toast } = useToast();
-  const [selectedSeat, setSelectedSeat] = useState<string | null>(null);
+  // Indexes of selected seats
+  const [selectedSeatIndexes, setSelectedSeatIndexes] = useState<number[]>([]);
   const [reservationTime, setReservationTime] = useState<number | null>(null);
   const [isReserved, setIsReserved] = useState(false);
 
   const form = useForm<Booking>({
     resolver: zodResolver(bookingSchema),
     defaultValues: {
-      flightId: flight.flight_number,
-      seatNumber: "",
+      flightId: flight._id,
+      seatIds: [],
       passengerName: "",
       passengerEmail: "",
     },
   });
 
+  // Reservation timer logic
   useEffect(() => {
     let interval: NodeJS.Timeout;
 
@@ -61,11 +83,11 @@ export const SeatBooking = ({
           if (prev && prev > 0) {
             return prev - 1;
           } else {
-            setSelectedSeat(null);
+            setSelectedSeatIndexes([]);
             setIsReserved(false);
-            form.setValue("seatNumber", "");
+            form.setValue("seatIds", []);
             toast(
-              "Your seat reservation has expired. Please select a seat again."
+              "Your seat reservation has expired. Please select seats again."
             );
             return null;
           }
@@ -76,25 +98,84 @@ export const SeatBooking = ({
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [reservationTime, form, toast]);
+  }, [reservationTime, form]);
 
-  const handleSeatSelect = (seat: string) => {
-    setSelectedSeat(seat);
-    setReservationTime(120); // 2 minutes in seconds
+  // Handle seat selection/deselection for multi-select
+  const handleSeatToggle = (idx: number) => {
     setIsReserved(true);
-    form.setValue("seatNumber", seat);
-    toast(
-      `Seat ${seat} is reserved for 2 minutes. Please complete your booking.`
-    );
+    setReservationTime(120); // 2 minutes in seconds
+
+    setSelectedSeatIndexes((prev) => {
+      if (prev.includes(idx)) {
+        // Deselect
+        const updated = prev.filter((i) => i !== idx);
+        form.setValue(
+          "seatIds",
+          updated.map((i) => flight.seatIds[i])
+        );
+        return updated;
+      } else {
+        // Select additional
+        const updated = [...prev, idx];
+        form.setValue(
+          "seatIds",
+          updated.map((i) => flight.seatIds[i])
+        );
+        return updated;
+      }
+    });
   };
 
-  const handleSubmit = (data: Booking) => {
-    console.log("Booking data:", data);
-    toast(
-      `Your seat ${data.seatNumber} on flight ${flight.flight_number} has been booked successfully.`
-    );
-    onBookingComplete?.(data);
-    onClose?.();
+  const handleSubmit = async (data: Booking) => {
+    const token = Cookies.get("token");
+    if (!token) {
+      toast("You must be logged in to book a seat.");
+      onClose?.();
+      return;
+    }
+
+    if (
+      !data.seatIds ||
+      !Array.isArray(data.seatIds) ||
+      data.seatIds.length === 0
+    ) {
+      toast.error("Please select at least one seat.");
+      return;
+    }
+
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/bookings`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          flightId: data.flightId,
+          seatIds: data.seatIds,
+          passengerName: data.passengerName,
+          passengerEmail: data.passengerEmail,
+        }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        toast.error(errorData?.message || "Booking failed. Please try again.");
+        return;
+      }
+
+      toast.success(
+        `Your seat${data.seatIds.length > 1 ? "s" : ""} ${selectedSeatIndexes
+          .map((i) => flight.seats[i])
+          .join(", ")} on flight ${
+          flight.flight_number
+        } has been booked successfully.`
+      );
+      onBookingComplete?.(data);
+      onClose?.();
+    } catch (e) {
+      toast.error("Booking failed. Please try again.");
+    }
   };
 
   const formatTime = (seconds: number) => {
@@ -124,19 +205,20 @@ export const SeatBooking = ({
       <CardContent className="space-y-6">
         {/* Seat Selection */}
         <div>
-          <h3 className="text-lg font-semibold mb-4">Select Your Seat</h3>
+          <h3 className="text-lg font-semibold mb-4">Select Your Seat(s)</h3>
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
-            {flight.seats.map((seat) => (
+            {flight.seats.map((seat, idx) => (
               <Button
                 key={seat}
-                variant={selectedSeat === seat ? "default" : "outline"}
+                variant={
+                  selectedSeatIndexes.includes(idx) ? "default" : "outline"
+                }
                 size="sm"
-                onClick={() => handleSeatSelect(seat)}
-                disabled={isReserved && selectedSeat !== seat}
+                onClick={() => handleSeatToggle(idx)}
                 className="h-10 w-full"
               >
                 {seat}
-                {selectedSeat === seat && (
+                {selectedSeatIndexes.includes(idx) && (
                   <CheckCircle className="h-3 w-3 ml-1" />
                 )}
               </Button>
@@ -145,7 +227,7 @@ export const SeatBooking = ({
         </div>
 
         {/* Passenger Information Form */}
-        {selectedSeat && (
+        {selectedSeatIndexes.length > 0 && (
           <div className="border-t pt-6">
             <h3 className="text-lg font-semibold mb-4">
               Passenger Information
@@ -194,14 +276,18 @@ export const SeatBooking = ({
                     <div>
                       <p className="font-semibold">Booking Summary</p>
                       <p className="text-sm text-muted-foreground">
-                        Seat {selectedSeat} • ${flight.price}
+                        Seats{" "}
+                        {selectedSeatIndexes
+                          .map((i) => flight.seats[i])
+                          .join(", ")}{" "}
+                        • ${flight.price} x {selectedSeatIndexes.length}
                       </p>
                     </div>
                     <Badge
                       variant="secondary"
                       className="text-lg font-semibold"
                     >
-                      ${flight.price}
+                      ${flight.price * selectedSeatIndexes.length}
                     </Badge>
                   </div>
                 </div>
@@ -211,9 +297,14 @@ export const SeatBooking = ({
                     type="submit"
                     variant="premium"
                     className="flex-1"
-                    disabled={!selectedSeat || !reservationTime}
+                    disabled={
+                      selectedSeatIndexes.length === 0 ||
+                      !reservationTime ||
+                      form.formState.isSubmitting
+                    }
                   >
-                    Confirm Booking (${flight.price})
+                    Confirm Booking ($
+                    {flight.price * selectedSeatIndexes.length})
                   </Button>
                   {onClose && (
                     <Button type="button" variant="outline" onClick={onClose}>

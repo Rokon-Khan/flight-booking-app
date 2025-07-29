@@ -15,7 +15,7 @@ export const flightSchema = z.object({
 
 export const bookingSchema = z.object({
   flightId: z.string().min(1, "Flight ID is required"),
-  seatNumber: z.string().min(1, "Seat number is required"),
+  seatIds: z.array(z.string()).min(1, "At least one seat must be selected"),
   passengerName: z
     .string()
     .min(2, "Passenger name must be at least 2 characters"),
