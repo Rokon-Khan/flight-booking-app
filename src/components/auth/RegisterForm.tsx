@@ -1,9 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-// import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
@@ -19,6 +16,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -27,13 +25,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { userRegistrationSchema, type UserRegistration } from "@/schemas/auth";
+import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-// import { useToast } from "@/hooks/use-toast";
 
 export const RegisterForm = () => {
-  //   const { toast } = useToast();
-
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
   const form = useForm<UserRegistration>({
     resolver: zodResolver(userRegistrationSchema),
     defaultValues: {
@@ -45,17 +46,41 @@ export const RegisterForm = () => {
     },
   });
 
-  const onSubmit = (data: UserRegistration) => {
-    console.log("Registration data:", data);
-    toast("Registration Successful!");
-    form.reset();
+  const onSubmit = async (data: UserRegistration) => {
+    setLoading(true);
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        toast.error(
+          errorData?.message || "Registration failed. Please try again."
+        );
+        setLoading(false);
+        return;
+      }
+
+      toast.success("Registration Successful!");
+      form.reset();
+      router.push("/login");
+    } catch (error) {
+      toast.error("Registration failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <Card className="w-full max-w-md mx-auto shadow-card">
       <CardHeader className="text-center">
         <CardTitle className="text-2xl font-bold bg-gradient-sky bg-clip-text text-transparent">
-          Join FlightBooking
+          Join FlightBook
         </CardTitle>
         <CardDescription>
           Create your account to start booking flights
@@ -121,7 +146,7 @@ export const RegisterForm = () => {
                 <FormItem>
                   <FormLabel>Phone Number</FormLabel>
                   <FormControl>
-                    <Input placeholder="1234567890" {...field} />
+                    <Input placeholder="01xxxxxxxx" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -154,8 +179,14 @@ export const RegisterForm = () => {
               )}
             />
 
-            <Button type="submit" variant="flight" className="w-full" size="lg">
-              Create Account
+            <Button
+              type="submit"
+              variant="flight"
+              className="w-full"
+              size="lg"
+              disabled={loading}
+            >
+              {loading ? "Creating..." : "Create Account"}
             </Button>
           </form>
         </Form>

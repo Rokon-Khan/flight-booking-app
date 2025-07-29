@@ -315,6 +315,14 @@ export const FlightList = () => {
         }
 
         const data = await response.json();
+        console.log("Full fetched data:", data);
+
+        // If seats aren't inside flights:
+        console.log("Flight seats:", data?.data?.flights[0]?.seats);
+
+        // If seats are returned separately:
+        console.log("Seats:", data?.data?.seats);
+
         setFlights(data.data.flights); // Access flights from the data.flights array
         setLoading(false);
       } catch (err) {
