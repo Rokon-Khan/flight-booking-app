@@ -179,21 +179,20 @@ export const FlightSearch = ({
                 }
               />
             </div>
-          </div>
-
-          <div className="flex gap-2">
-            <Button
-              onClick={handleSearch}
-              variant="flight"
-              className="flex-1"
-              disabled={loading}
-            >
-              <Search className="h-4 w-4 mr-2" />
-              {loading ? "Searching..." : "Search Flights"}
-            </Button>
-            <Button onClick={handleClear} variant="outline">
-              Clear
-            </Button>
+            <div className="flex gap-2 mt-6">
+              <Button
+                onClick={handleSearch}
+                variant="flight"
+                className="flex-1"
+                disabled={loading}
+              >
+                <Search className="h-4 w-4 mr-2" />
+                {loading ? "Searching..." : "Search Flights"}
+              </Button>
+              <Button onClick={handleClear} variant="outline">
+                Clear
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>

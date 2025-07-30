@@ -1,6 +1,5 @@
 import heroImage from "@/assets/Flight-aviation-Image.png";
 import Image from "next/image";
-import SearchCard from "./SearchCard";
 
 export default function HeroSection() {
   return (
@@ -23,9 +22,9 @@ export default function HeroSection() {
           Book with confidence, fly with comfort
         </p>
       </div>
-      <div className=" mt-4 max-w-4xl px-4">
+      {/* <div className=" mt-4 max-w-4xl px-4">
         <SearchCard />
-      </div>
+      </div> */}
     </div>
   );
 }

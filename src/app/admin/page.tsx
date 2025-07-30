@@ -16,6 +16,7 @@ import {
 import { FlightType } from "@/schemas/flight";
 import Cookies from "js-cookie";
 import { Plus, Settings } from "lucide-react";
+import Link from "next/link";
 import { toast } from "sonner";
 
 export default function AdminPage() {
@@ -174,6 +175,11 @@ export default function AdminPage() {
               <FlightForm onSubmit={handleAddFlight} />
             </DialogContent>
           </Dialog>
+          <Link href="/booking-list">
+            <Button variant="flight" className="ml-4">
+              All Bookings
+            </Button>
+          </Link>
         </div>
 
         {/* Flights Grid */}
