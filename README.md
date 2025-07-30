@@ -1,4 +1,4 @@
-# FlightBook Web App
+# FlightBook Web App With Next.js & TypeScript
 
 FlightBook is a modern, responsive flight booking system built with **Next.js**, **TypeScript**, **TailwindCSS**, and **Shadcn**. It provides a clean and user-friendly interface for users to browse, book, and manage flights, with features like authentication, flight management, and seat booking.
 
