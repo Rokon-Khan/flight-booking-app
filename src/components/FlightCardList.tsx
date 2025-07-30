@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import FlightCard from "./FlightCard";
+import LoadingSkeleton from "./LoadingSkeleton";
 
 interface Flight {
   _id: string;
@@ -49,7 +50,7 @@ export const FlightList = () => {
   }, []);
 
   if (loading) {
-    return <div>Loading flights...</div>;
+    return <LoadingSkeleton />;
   }
 
   if (error) {
