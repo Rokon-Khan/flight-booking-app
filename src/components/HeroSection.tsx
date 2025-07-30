@@ -1,9 +1,10 @@
 import heroImage from "@/assets/Flight-aviation-Image.png";
 import Image from "next/image";
+import SearchCard from "./SearchCard";
 
 export default function HeroSection() {
   return (
-    <div className="relative h-96 flex items-center justify-center">
+    <div className="relative h-96 flex flex-col items-center justify-center">
       <Image
         src={heroImage}
         alt="Hero image"
@@ -21,6 +22,9 @@ export default function HeroSection() {
         <p className="text-lg md:text-xl">
           Book with confidence, fly with comfort
         </p>
+      </div>
+      <div className=" mt-4 max-w-4xl px-4">
+        <SearchCard />
       </div>
     </div>
   );
