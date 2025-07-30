@@ -191,14 +191,14 @@ export const Navbar = () => {
       >
         Flights
       </Link>
-      <Link
+      {/* <Link
         href="/bookings"
         className={`text-sm font-medium transition-colors hover:text-primary ${
           isActive("/bookings") ? "text-primary" : "text-muted-foreground"
         }`}
       >
         My Bookings
-      </Link>
+      </Link> */}
       <Link
         href="/admin"
         className={`text-sm font-medium transition-colors hover:text-primary ${

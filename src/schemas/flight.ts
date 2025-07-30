@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const flightSchema = z.object({
+  _id: z.string().optional(),
   airline: z.string().min(2, "Airline name must be at least 2 characters"),
   flight_number: z
     .string()
@@ -24,3 +25,15 @@ export const bookingSchema = z.object({
 
 export type Flight = z.infer<typeof flightSchema>;
 export type Booking = z.infer<typeof bookingSchema>;
+
+export interface FlightType {
+  _id: string;
+  airline: string;
+  flight_number: string;
+  origin: string;
+  destination: string;
+  date: string;
+  time: string;
+  price: number;
+  seats: string[];
+}

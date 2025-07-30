@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
+import LoadingSkeleton from "@/components/LoadingSkeleton";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Cookies from "js-cookie";
@@ -80,7 +81,7 @@ export default function MyBookingPage() {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[40vh]">
-        <span>Loading your bookings...</span>
+        <LoadingSkeleton />
       </div>
     );
   }

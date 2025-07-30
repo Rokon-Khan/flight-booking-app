@@ -25,9 +25,15 @@ import { X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-interface FlightFormProps {
+// interface FlightFormProps {
+//   initialData?: Partial<Flight>;
+//   onSubmit?: (data: Flight) => void;
+//   isEdit?: boolean;
+// }
+
+export interface FlightFormProps {
   initialData?: Partial<Flight>;
-  onSubmit?: (data: Flight) => void;
+  onSubmit?: (data: Flight) => void | Promise<void>;
   isEdit?: boolean;
 }
 
@@ -42,6 +48,7 @@ export const FlightForm = ({
   const form = useForm<Flight>({
     resolver: zodResolver(flightSchema),
     defaultValues: {
+      _id: initialData?._id,
       airline: initialData?.airline || "",
       flight_number: initialData?.flight_number || "",
       origin: initialData?.origin || "",
@@ -53,8 +60,8 @@ export const FlightForm = ({
     },
   });
 
-  const handleSubmit = (data: Flight) => {
-    console.log("Flight data:", data);
+  const handleSubmit = async (data: Flight) => {
+    await onSubmit?.(data);
     toast.success(
       `Flight ${data.flight_number} has been ${
         isEdit ? "updated" : "added"

@@ -91,8 +91,6 @@ export default function FlightDetailPage() {
         const data = await response.json();
         setFlight(data.data.flight);
         setSeats(data.data?.seats);
-        console.log("Fetched flight:", data.data.flight);
-        console.log("Fetched seats:", data.data?.seats);
 
         // Try to get userId if already booked
         const bookedBySeat = data.data?.seats?.find(
